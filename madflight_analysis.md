@@ -246,8 +246,8 @@ Repo này đã được customize cho bộ phần cứng cụ thể:
 | IMU | MPU-9265 | MPU9250 (tương thích) | I2C Bus 1 | 3.3V từ ESP | SDA=11, SCL=13, INT=14, NCS=10, ADO=12 |
 | Barometer | BME/BMP280 | BMP280 | I2C Bus 0 | 3.3V từ ESP | SDA=8, SCL=9 |
 | GPS | NEO-6M V2 | UBLOX | Serial Bus 1 | 3.3V từ ESP | ESP_RX=3 ← GPS_TX, ESP_TX=46 → GPS_RX |
-| Receiver | ELRS | CRSF | Serial Bus 0 | 3.3V từ ESP | ESP_RX=18 ← ELRS_TX, ESP_TX=17 → ELRS_RX |
-| Motor 1-4 | BLDC 2212 + ESC 40A | PWM 400Hz, 950-2000µs | GPIO | từ ESC/Pin | M1=4, M2=5, M3=6, M4=7 |
+| Receiver | Radiomaster XR1 Nano ELRS | CRSF | Serial Bus 0 | 3.3V từ ESP | ESP_RX=18 ← ELRS_TX, ESP_TX=17 → ELRS_RX |
+| Motor 1-4 | BLDC A2212 930KV + ESC 40A | PWM 400Hz, 950-2000µs | GPIO | từ ESC/Pin | M1=4, M2=5, M3=6, M4=7 |
 | LED | Built-in | HIGH_IS_ON | GPIO 2 | — | — |
 
 > **Ghi chú BME/BMP280:** Nếu dùng BME280 (có humidity), driver `BMP280` trong madflight vẫn đọc áp suất/nhiệt độ bình thường — hai chip tương thích register cho phần barometer.

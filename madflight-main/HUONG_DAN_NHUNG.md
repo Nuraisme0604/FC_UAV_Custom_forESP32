@@ -1,5 +1,5 @@
 # Hướng dẫn Nhúng Firmware Quadcopter
-**ESP32-S3 N16R8 + MPU-9265 + BMP280 + GPS NEO-6M + ELRS + 4x BLDC 2212**  
+**ESP32-S3 N16R8 + MPU-9265 + BMP280 + GPS NEO-6M + ELRS + 4x BLDC A2212 930KV**  
 Firmware: [madflight v2.3.1](https://madflight.com) — MIT License
 
 ---
@@ -26,7 +26,7 @@ Firmware: [madflight v2.3.1](https://madflight.com) — MIT License
 | Barometer | BMP280 | I2C Bus 0 |
 | GPS | NEO-6M V2 | Serial Bus 1 |
 | Receiver | ELRS (CRSF protocol) | Serial Bus 0 |
-| Motor | 4x BLDC 2212 + ESC 40A | PWM 400Hz |
+| Motor | 4x BLDC A2212 930KV + ESC 40A | PWM 400Hz |
 
 **Nguồn:** Cấp **5V** vào chân **Vin/VBUS** của ESP32-S3. Board tự tạo 3.3V cho cảm biến.
 

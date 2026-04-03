@@ -1,7 +1,7 @@
 # madflight — Quadcopter ESP32-S3 N16R8
 
 Firmware flight controller dựa trên [madflight v2.3.1-DEV](https://madflight.com) — MIT License.
-Đã customize cho bộ phần cứng cụ thể: **ESP32-S3 N16R8 + MPU-9265 + BME/BMP280 + GPS NEO-6M + ELRS + 4x BLDC 2212**.
+Đã customize cho bộ phần cứng cụ thể: **ESP32-S3 N16R8 + MPU-9265 + BME/BMP280 + GPS NEO-6M + ELRS + 4x BLDC A2212 930KV**.
 
 > **DEV Version** — bản phát triển, chưa được kiểm tra bay.
 > Dùng [release version](https://github.com/qqqlab/madflight/releases) nếu cần bản đã flight tested.
@@ -16,8 +16,8 @@ Firmware flight controller dựa trên [madflight v2.3.1-DEV](https://madflight.
 | IMU | MPU-9265 (driver MPU9250) | I2C Bus 1 | 3.3V từ ESP | SDA=11, SCL=13, INT=14, NCS=10, ADO=12 |
 | Barometer | BME/BMP280 (driver BMP280) | I2C Bus 0 | 3.3V từ ESP | SDA=8, SCL=9 |
 | GPS | NEO-6M V2 | Serial Bus 1 | 3.3V từ ESP | ESP_RX=3, ESP_TX=46 |
-| Receiver | ELRS (CRSF) | Serial Bus 0 | 3.3V từ ESP | ESP_RX=18, ESP_TX=17 |
-| Motor 1-4 | BLDC 2212 + ESC 40A | PWM 400Hz | từ ESC | M1=GPIO4, M2=GPIO5, M3=GPIO6, M4=GPIO7 |
+| Receiver | Radiomaster XR1 Nano ELRS (CRSF) | Serial Bus 0 | 3.3V từ ESP | ESP_RX=18, ESP_TX=17 |
+| Motor 1-4 | BLDC A2212 930KV + ESC 40A | PWM 400Hz | từ ESC | M1=GPIO4, M2=GPIO5, M3=GPIO6, M4=GPIO7 |
 | LED | Built-in | GPIO 2 | — | — |
 
 ### Sơ đồ motor (Betaflight X-frame)

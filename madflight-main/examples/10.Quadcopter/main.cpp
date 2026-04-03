@@ -22,7 +22,7 @@ Hardware Configuration:
     Receiver:   ELRS/CRSF (Serial Bus 0)
                   VCC -> 3.3V  | GND -> GND
                   TX  -> GPIO18 | RX  -> GPIO17
-    Motors:     4x BLDC 2212 via ESC 40A
+    Motors:     4x BLDC A2212 930KV via ESC 40A
                   Motor1 (back-right  CW)  -> GPIO4  (pin_out0)
                   Motor2 (front-right CCW) -> GPIO5  (pin_out1)
                   Motor3 (back-left   CCW) -> GPIO6  (pin_out2)

@@ -8,7 +8,7 @@
 ## [PROJECT]
 
 - **Name:** madflight
-- **Goal:** Firmware flight controller hiệu năng cao cho ESP32-S3 N16R8, cấu hình Quadcopter với MPU-9265 + BME/BMP280 + GPS NEO-6M + ELRS + 4x BLDC 2212.
+- **Goal:** Firmware flight controller hiệu năng cao cho ESP32-S3 N16R8, cấu hình Quadcopter với MPU-9265 + BME/BMP280 + GPS NEO-6M + ELRS + 4x BLDC A2212 930KV.
 - **Stack:**
   - C++ trên Arduino framework
   - PlatformIO (env `ESP32-S3-N16R8`)

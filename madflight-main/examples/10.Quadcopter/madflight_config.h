@@ -8,7 +8,7 @@
     Barometer:  BMP280          (I2C, I2C Bus 0: SDA=GPIO8,  SCL=GPIO9)
     GPS:        NEO-6M V2       (Serial Bus 1: ESP_RX=GPIO3,  ESP_TX=GPIO46)
     Receiver:   ELRS/CRSF       (Serial Bus 0: ESP_RX=GPIO18, ESP_TX=GPIO17)
-    Motors:     4x BLDC 2212 via ESC 40A (PWM: GPIO4, GPIO5, GPIO6, GPIO7)
+    Motors:     4x BLDC A2212 930KV via ESC 40A (PWM: GPIO4, GPIO5, GPIO6, GPIO7)
 
   NOTE về ADO và NCS của MPU-9265:
     - ADO (GPIO12): Setup code sẽ kéo xuống LOW → địa chỉ I2C = 0x68

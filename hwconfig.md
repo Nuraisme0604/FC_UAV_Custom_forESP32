@@ -13,7 +13,7 @@ INT -> 14
 NCS -> 10
 
 
-// barometer  BME/BMP280
+// barometer  BME/BMP280 
 Nguồn 3.3V từ ESP
 nối chân ... -> ... ESP
 VCC -> 3.3V
@@ -29,7 +29,7 @@ VCC -> 3.3V
 RX -> 46
 TX -> 3
 
-//Receiver ELRS
+//Receiver Radiomaster XR1 Nano ELRS (2.4GHz/900MHz)
 Nguồn 3.3V từ ESP
 nối chân ... -> ... ESP
 VCC -> 3.3V
@@ -37,7 +37,7 @@ GND -> GND
 TX -> 18
 RX -> 17
 
-// động cơ PLDC 2212 KV ...-> ESC 40A -> ESP
+// động cơ BLDC A2212 930KV -> ESC 40A -> ESP
 động cơ 1 -> 4
 động cơ 2 -> 5
 động cơ 3 -> 6
