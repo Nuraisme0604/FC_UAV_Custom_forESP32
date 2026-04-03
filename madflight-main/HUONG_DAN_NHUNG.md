@@ -22,7 +22,7 @@ Firmware: [madflight v2.3.1](https://madflight.com) — MIT License
 | Linh kiện | Model | Giao tiếp |
 |-----------|-------|-----------|
 | Vi điều khiển | ESP32-S3 N16R8 (16MB Flash, 8MB OPI PSRAM) | — |
-| IMU | MPU-9265 / MPU-9250 (Gyro + Accel + Mag) | I2C Bus 1 |
+| IMU | MPU-9265 / MPU-9250 (Gyro + Accel + Mag) | SPI Bus 0 |
 | Barometer | BMP280 | I2C Bus 0 |
 | GPS | NEO-6M V2 | Serial Bus 1 |
 | Receiver | ELRS (CRSF protocol) | Serial Bus 0 |
@@ -34,20 +34,21 @@ Firmware: [madflight v2.3.1](https://madflight.com) — MIT License
 
 ## 2. Sơ đồ đấu dây
 
-### IMU MPU-9265 — I2C Bus 1
+### IMU MPU-9265 — SPI Bus 0
 
 | Chân MPU-9265 | GPIO ESP32-S3 | Ghi chú |
 |---------------|---------------|---------|
 | VCC | 3.3V | |
 | GND | GND | |
-| SCL | **GPIO 13** | |
-| SDA | **GPIO 11** | |
+| SCL | **GPIO 13** | Trong SPI đây là **SCLK** |
+| SDA | **GPIO 11** | Trong SPI đây là **SDI/MOSI** (ESP -> IMU) |
+| ADO | **GPIO 12** | Trong SPI đây là **SDO/MISO** (IMU -> ESP) |
+| NCS | **GPIO 10** | Chip Select (**CS**) |
 | INT | **GPIO 14** | Interrupt bắt buộc |
-| ADO | **GPIO 12** | Code kéo xuống LOW → địa chỉ I2C = `0x68` |
-| NCS | **GPIO 10** | Code kéo lên HIGH → enable I2C mode (không phải SPI) |
 
-> **Quan trọng:** ADO và NCS được điều khiển bởi `setup()` trong `main.cpp`.  
-> Không cần đấu thêm điện trở pull-up/pull-down bên ngoài.
+> **Quan trọng:** Board thường chỉ in nhãn SCL/SDA/ADO/NCS, không in MISO/MOSI.  
+> Map đúng là: `SCL->SCLK`, `SDA->MOSI`, `ADO->MISO`, `NCS->CS`.
+> Không kéo cứng ADO/NCS như chế độ I2C.
 
 ### Barometer BMP280 — I2C Bus 0
 
@@ -111,10 +112,10 @@ Firmware: [madflight v2.3.1](https://madflight.com) — MIT License
 | 7 | Motor 4 ESC |
 | 8 | BMP280 SDA |
 | 9 | BMP280 SCL |
-| 10 | MPU-9265 NCS (HIGH = I2C mode) |
-| 11 | MPU-9265 SDA |
-| 12 | MPU-9265 ADO (LOW = addr 0x68) |
-| 13 | MPU-9265 SCL |
+| 10 | MPU-9265 NCS/CS (SPI) |
+| 11 | MPU-9265 SDA/SDI/MOSI (SPI) |
+| 12 | MPU-9265 ADO/SDO/MISO (SPI) |
+| 13 | MPU-9265 SCL/SCLK (SPI) |
 | 14 | MPU-9265 INT |
 | 17 | ESP TX → Receiver RX (telemetry) |
 | 18 | Receiver TX → ESP RX (RC data) |
@@ -134,7 +135,7 @@ madflight-main/
 └── examples/
     └── 10.Quadcopter/
         ├── 10.Quadcopter.ino   ← Mở file này nếu dùng Arduino IDE
-        ├── main.cpp            ← Code chính (đã thêm ADO/NCS init)
+   ├── main.cpp            ← Code chính (setup, control loop, mixer)
         └── madflight_config.h  ← Cấu hình pin và hardware
 ```
 
@@ -142,12 +143,11 @@ madflight-main/
 
 **`madflight_config.h`** — Cấu hình phần cứng:
 - Dùng `default_ESP32-S3.h` làm nền
-- Override I2C Bus 1: SDA=11, SCL=13 (cho MPU-9265)
+- Chạy IMU qua SPI (`imu_bus_type = SPI`, `imu_spi_bus = 0`, `pin_imu_cs = 10`)
 - `imu_gizmo = MPU9250`, `bar_gizmo = BMP280`, `gps_gizmo = UBLOX`, `rcl_gizmo = CRSF`
 
 **`main.cpp`** — Code chính:
-- Thêm `pinMode(12, OUTPUT); digitalWrite(12, LOW);` → ADO = LOW
-- Thêm `pinMode(10, OUTPUT); digitalWrite(10, HIGH);` → NCS = HIGH (I2C mode)
+- Không ép chân ADO/NCS kiểu I2C để tránh xung đột khi dùng SPI IMU
 
 **`platformio.ini`** — Build config:
 - Thêm env `ESP32-S3-N16R8` với 16MB Flash + OPI PSRAM
@@ -158,42 +158,204 @@ madflight-main/
 
 ## 4. Nhúng bằng Arduino IDE
 
-### Bước 1: Cài đặt
+Mục này hướng dẫn chi tiết theo workflow thực tế cho **ESP32-S3 N16R8**, ưu tiên dùng đúng mã nguồn local trong repo hiện tại.
 
-1. Cài **Arduino IDE 2.x** từ [arduino.cc](https://www.arduino.cc/en/software)
-2. Vào **File → Preferences**, thêm vào _Additional boards manager URLs_:
+### 4.1 Chuẩn bị môi trường
+
+#### Bước 1: Cài Arduino IDE 2.x
+
+1. Tải và cài Arduino IDE 2.x từ [arduino.cc/en/software](https://www.arduino.cc/en/software)
+2. Mở IDE, vào:
+   - **File -> Preferences**
+   - hoặc phím tắt `Ctrl + ,`
+3. Ở ô **Additional boards manager URLs**, thêm URL:
    ```
    https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
    ```
-3. **Tools → Board → Board Manager** → Tìm **esp32 by Espressif Systems** → Install
-4. **Tools → Manage Libraries** → Tìm **madflight** → Install
+4. Nhấn **OK**
 
-### Bước 2: Cấu hình Board
+Minh họa text:
 
-```
-Tools → Board             : ESP32S3 Dev Module
-Tools → Flash Size        : 16MB (128Mb)
-Tools → PSRAM             : OPI PSRAM          ← BẮT BUỘC đúng với N16R8
-Tools → Flash Mode        : QIO 80MHz
-Tools → USB CDC On Boot   : Enabled
-Tools → Partition Scheme  : 16M Flash (3MB APP/9.9MB FATFS)
-Tools → Upload Speed      : 921600
-Tools → Port              : COMx (chọn đúng port)
+```text
+File
+ └─ Preferences
+    └─ Additional boards manager URLs:
+       https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
 ```
 
-> **Lưu ý PSRAM:** Chọn đúng **OPI PSRAM** cho ESP32-S3 N16R8. Chọn sai sẽ crash khi boot.
+#### Bước 2: Cài core ESP32
 
-### Bước 3: Mở và Upload
+1. Vào **Tools -> Board -> Boards Manager**
+2. Tìm từ khóa `esp32`
+3. Cài gói **esp32 by Espressif Systems**
 
-1. Mở `examples/10.Quadcopter/10.Quadcopter.ino`
-2. Nhấn **Upload** (`Ctrl+U`)
+Khuyến nghị phiên bản:
+- Dùng bản stable mới nhất
+- Nếu gặp lỗi lạ sau khi update, có thể pin về bản stable cũ hơn
 
-### Bước 4: Nếu không tự vào boot mode
+### 4.2 Cài thư viện madflight local (chi tiết)
 
-1. Giữ nút **BOOT** trên board
-2. Nhấn **RESET** một lần
+Có 3 cách. Bạn chỉ cần chọn 1 cách, không làm đồng thời.
+
+#### Cách A (khuyến nghị): Cài local bằng Add .ZIP Library
+
+Phù hợp khi muốn Arduino IDE nhận repo như một library chuẩn.
+
+1. Đóng Arduino IDE
+2. Nén thư mục `madflight-main/` thành file zip
+   - Bên trong zip phải có `library.properties` và thư mục `src/`
+3. Mở Arduino IDE
+4. Vào **Sketch -> Include Library -> Add .ZIP Library...**
+5. Chọn file zip vừa tạo
+
+Sau khi cài, kiểm tra nhanh:
+- Trong sketchbook sẽ có thư mục `libraries/madflight-main` (hoặc tên tương tự)
+- Bên trong có `library.properties`
+
+#### Cách B: Cài local thủ công vào thư mục libraries
+
+Phù hợp khi bạn muốn quản lý phiên bản local ổn định, dễ kiểm soát.
+
+1. Xác định thư mục sketchbook của Arduino IDE:
+   - **File -> Preferences -> Sketchbook location**
+2. Tạo thư mục:
+   ```
+   <Sketchbook>/libraries/madflight
+   ```
+3. Copy các thành phần sau từ repo vào thư mục trên:
+   - `library.properties`
+   - toàn bộ thư mục `src/`
+4. Khởi động lại Arduino IDE
+
+Checklist cấu trúc đúng:
+
+```text
+<Sketchbook>/libraries/madflight/
+ ├─ library.properties
+ └─ src/
+    ├─ madflight.h
+    └─ ...
+```
+
+#### Cách C: Dùng bản release từ Library Manager
+
+1. **Sketch -> Include Library -> Manage Libraries**
+2. Tìm `madflight`
+3. Install `madflight by qqqlab`
+
+Lưu ý quan trọng:
+- Nếu dùng bản custom trong repo này thì không nên dùng Cách C
+- Tránh xung đột bản local và bản release cùng lúc
+
+### 4.3 Mở sketch đúng cách
+
+1. Vào **File -> Open...**
+2. Mở file:
+   ```
+   madflight-main/examples/10.Quadcopter/10.Quadcopter.ino
+   ```
+3. Sau khi mở, IDE sẽ hiện nhiều tab liên quan cùng sketch
+
+Minh họa text:
+
+```text
+10.Quadcopter.ino   |   main.cpp   |   madflight_config.h
+   entry sketch     | logic chính  | pin/config phần cứng
+```
+
+### 4.4 Cấu hình Tools cho ESP32-S3 N16R8 (bắt buộc)
+
+Vào **Tools** và đặt theo bảng dưới.
+
+| Mục (Tools ->) | Giá trị khuyến nghị | Ghi chú |
+|----------------|---------------------|---------|
+| Board | `ESP32S3 Dev Module` | Dòng S3 generic của Espressif |
+| Port | `COMx` | Chọn đúng cổng serial của board |
+| USB CDC On Boot | `Enabled` | Bắt buộc để dùng Serial Monitor qua USB |
+| USB Mode | `Hardware CDC and JTAG` | Giá trị ổn định cho đa số DevKit S3 |
+| Flash Size | `16MB (128Mb)` | Khớp N16R8 |
+| Flash Mode | `QIO 80MHz` | Khuyến nghị |
+| PSRAM | `OPI PSRAM` | Bắt buộc với N16R8 |
+| Partition Scheme | `16M Flash (3MB APP/9.9MB FATFS)` | Dư cho firmware + dữ liệu |
+| Upload Speed | `921600` | Nếu lỗi upload, hạ xuống 460800 |
+| Core Debug Level | `None` | Đổi `Verbose` khi cần debug |
+
+Minh họa text:
+
+```text
+Tools
+ ├─ Board: ESP32S3 Dev Module
+ ├─ Flash Size: 16MB
+ ├─ PSRAM: OPI PSRAM
+ ├─ USB CDC On Boot: Enabled
+ └─ Partition Scheme: 16M Flash (3MB APP/9.9MB FATFS)
+```
+
+Cảnh báo quan trọng:
+- Chọn sai PSRAM (Quad/QSPI) có thể gây reboot loop ngay sau boot
+- Chọn sai Flash Size có thể gây lỗi nạp hoặc runtime bất thường
+
+### 4.5 Verify và Upload
+
+#### Verify
+
+1. Nhấn **Verify** (nút check) hoặc `Ctrl+R`
+2. Nếu compile thành công, IDE sẽ in thống kê RAM/Flash
+
+#### Upload
+
+1. Cắm cáp USB data tốt
+2. Chọn đúng **Tools -> Port**
+3. Nhấn **Upload** hoặc `Ctrl+U`
+4. Thành công khi thấy dòng tương tự:
+   ```
+   Leaving...
+   Hard resetting via RTS pin...
+   ```
+
+### 4.6 Trường hợp không vào boot mode tự động
+
+Thao tác thủ công:
+
+1. Giữ **BOOT**
+2. Nhấn nhả **RESET**
 3. Thả **BOOT**
-4. Nhấn Upload trong IDE
+4. Bấm **Upload** ngay
+
+Nếu vẫn lỗi:
+- Đổi cáp USB khác (phải là cáp data)
+- Cắm trực tiếp vào cổng USB máy tính, không qua hub
+- Hạ Upload Speed xuống `460800` hoặc `115200`
+
+### 4.7 Mở Serial Monitor và kiểm tra lần đầu
+
+1. **Tools -> Serial Monitor** (`Ctrl+Shift+M`)
+2. Baud rate: `115200`
+3. Đặt board đứng yên hoàn toàn 6 giây đầu để gyro calibration
+4. Kiểm tra log khởi động theo mục 6
+
+### 4.8 Lỗi thường gặp với Arduino IDE + ESP32-S3 và cách xử lý
+
+| Triệu chứng/lỗi | Nguyên nhân thường gặp | Cách xử lý nhanh |
+|-----------------|------------------------|------------------|
+| `madflight.h: No such file or directory` | Chưa cài library local đúng cấu trúc | Làm lại mục 4.2 Cách A/B, kiểm tra có `library.properties` và `src/madflight.h` |
+| `Multiple libraries were found for "madflight.h"` | Trùng bản local và bản Library Manager | Gỡ bớt 1 bản, chỉ giữ 1 nguồn thư viện |
+| `A fatal error occurred: Failed to connect to ESP32-S3` | Không vào bootloader hoặc COM sai | Làm mục 4.6, kiểm tra Port, cáp, driver |
+| Upload xong nhưng board reboot liên tục | Sai lựa chọn PSRAM | Đặt lại `PSRAM = OPI PSRAM` |
+| Không thấy COM port | Cáp chỉ sạc, driver thiếu, cổng USB lỗi | Đổi cáp data, đổi cổng USB, cài driver CP210x/CH34x |
+| Serial Monitor không có log | USB CDC chưa bật hoặc baud sai | `USB CDC On Boot = Enabled`, baud `115200`, nhấn RESET |
+| `Sketch too large` | Partition/flash chọn không đúng | Chọn lại `16MB` + partition `16M Flash (3MB APP/9.9MB FATFS)` |
+| Compile lỗi ngẫu nhiên sau khi đổi board package | Cache build cũ | Đóng IDE, mở lại, verify lại; nếu cần gỡ và cài lại esp32 core |
+
+### 4.9 Checklist trước khi ra bãi test
+
+1. Verify pass, Upload pass
+2. Serial log khởi động đầy đủ
+3. IMU nhận đúng, GPS nhận đúng, RCL nhận đúng
+4. `prcl` đọc được kênh RC
+5. Đã tháo cánh khi test motor lần đầu
+
+> Khuyến nghị: Arduino IDE dùng được tốt cho nạp nhanh và kiểm tra cơ bản. Nếu cần quản lý build/release ổn định hơn, chuyển sang PlatformIO ở mục 5.
 
 ---
 
@@ -263,7 +425,7 @@ Processor: ESP32-S3
 [ofl] NONE
 [gps] UBLOX ser=1
 
-IMU: MPU9250 installed on I2C1
+IMU: MPU9250 installed on SPI0
 GPS: UBLOX installed on Serial1
 RCL: CRSF installed on Serial0
 
@@ -362,10 +524,10 @@ Kết nối Serial Monitor (115200 baud), gõ các lệnh sau:
 
 ### IMU không nhận (`IMU install failed`)
 
-1. Gõ `i2cscan` — kiểm tra địa chỉ `0x68` có xuất hiện không
-2. Kiểm tra ADO: GPIO12 phải được kéo xuống LOW trong `setup()`
-3. Kiểm tra NCS: GPIO10 phải được kéo lên HIGH trong `setup()`
-4. Kiểm tra đấu dây SDA=11, SCL=13 đúng chưa
+1. Kiểm tra `imu_bus_type` đang là `SPI` và `imu_spi_bus = 0` trong `madflight_config.h`
+2. Kiểm tra chân SPI đúng: SCLK=13, MOSI=11, MISO=12, CS=10, INT=14
+3. Đảm bảo **không** có code nào set GPIO12 làm OUTPUT LOW (sẽ khóa MISO)
+4. Kiểm tra dây CS/INT chắc chắn, không lỏng
 
 ### Receiver không kết nối (`RCL: not connected`)
 

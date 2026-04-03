@@ -1,6 +1,6 @@
 .pio/build/ESP32-S3-N16R8/FrameworkArduino/esp32-hal-misc.c.o: \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-misc.c \
- C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/qio_qspi/include/sdkconfig.h \
+ C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/qio_opi/include/sdkconfig.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/freertos/include/freertos/FreeRTOS.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/freertos/include/esp_additions/freertos/FreeRTOSConfig.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_compiler.h \

@@ -1,6 +1,6 @@
 .pio/build/ESP32-S3-N16R8/FrameworkArduino/esp32-hal-tinyusb.c.o: \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-tinyusb.c \
- C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/qio_qspi/include/sdkconfig.h \
+ C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/qio_opi/include/sdkconfig.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/log/include/esp_log.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_rom/include/esp_rom_sys.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/soc/esp32s3/include/soc/reset_reasons.h \

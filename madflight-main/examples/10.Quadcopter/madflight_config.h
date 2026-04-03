@@ -4,15 +4,16 @@
 
   Target hardware:
     MCU:        ESP32-S3 N16R8 (16MB Flash QIO, 8MB OPI PSRAM)
-    IMU:        MPU-9265 / MPU-9250 (I2C, I2C Bus 1: SDA=GPIO11, SCL=GPIO13)
+    IMU:        MPU-9265 / MPU-9250 (SPI Bus 0: SCL/SCLK=GPIO13, SDA/SDI=GPIO11, ADO/SDO=GPIO12, NCS/CS=GPIO10)
     Barometer:  BMP280          (I2C, I2C Bus 0: SDA=GPIO8,  SCL=GPIO9)
     GPS:        NEO-6M V2       (Serial Bus 1: ESP_RX=GPIO3,  ESP_TX=GPIO46)
     Receiver:   ELRS/CRSF       (Serial Bus 0: ESP_RX=GPIO18, ESP_TX=GPIO17)
     Motors:     4x BLDC A2212 930KV via ESC 40A (PWM: GPIO4, GPIO5, GPIO6, GPIO7)
 
-  NOTE về ADO và NCS của MPU-9265:
-    - ADO (GPIO12): Setup code sẽ kéo xuống LOW → địa chỉ I2C = 0x68
-    - NCS (GPIO10): madflight tự kéo lên HIGH khi setup I2C mode
+  NOTE về SPI cho MPU-9265:
+    - Trên module, chân in là SCL/SDA/ADO/NCS (không in MOSI/MISO)
+    - Map SPI: SCL->SCLK, SDA->MOSI(SDI), ADO->MISO(SDO), NCS->CS
+    - Không kéo cứng ADO/NCS theo kiểu I2C
 
 ========================================================================================================================*/
 
@@ -23,7 +24,7 @@ const char madflight_config[] = R""(
 
 // ===========================================================
 //  Override pins cho ESP32-S3 N16R8
-//  PHẦN LỚN đã đúng với default_ESP32-S3.h, chỉ cần override I2C1 và các gizmo
+//  PHẦN LỚN đã đúng với default_ESP32-S3.h, chỉ cần override gizmo/bus cần dùng
 // ===========================================================
 
 // --- LED ---
@@ -36,18 +37,12 @@ pin_led       2
 // pin_i2c0_sda  8   ← default đã có
 // pin_i2c0_scl  9   ← default đã có
 
-// --- I2C Bus 1 --- IMU MPU-9265 ---
-// OVERRIDE: default dùng SDA=21, SCL=47 → đổi sang SDA=11, SCL=13
-pin_i2c1_sda  11
-pin_i2c1_scl  13
-
-// --- IMU: MPU-9265 (tương thích MPU-9250) ---
+// --- IMU: MPU-9265 (tương thích MPU-9250) chạy SPI ---
 imu_gizmo     MPU9250   // MPU-9265 tương thích hoàn toàn với driver MPU9250
-imu_bus_type  I2C
-imu_i2c_bus   1
-imu_i2c_adr   0         // 0 = dùng địa chỉ mặc định (0x68 khi ADO=LOW)
+imu_bus_type  SPI
+imu_spi_bus   0
 pin_imu_int   14        // trùng default
-pin_imu_cs    10        // NCS pin: madflight kéo HIGH để enable I2C mode
+pin_imu_cs    10        // SPI chip select
 
 // --- Barometer: BMP280 ---
 bar_gizmo     BMP280

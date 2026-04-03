@@ -8,11 +8,10 @@ Based on madflight - https://madflight.com
 Hardware Configuration:
 
     MCU:        ESP32-S3 N16R8 (16MB Flash QIO, 8MB OPI PSRAM)
-    IMU:        MPU-9265 / MPU-9250 (I2C Bus 1)
-                  VCC -> 3.3V  |  GND -> GND
-                  SCL -> GPIO13 | SDA -> GPIO11
-                  INT -> GPIO14 | ADO -> GND (via GPIO12, driven LOW in setup)
-                  NCS -> 3.3V  (via GPIO10, madflight drives HIGH for I2C mode)
+    IMU:        MPU-9265 / MPU-9250 (SPI Bus 0)
+            VCC -> 3.3V  |  GND -> GND
+            SCL(SCLK) -> GPIO13 | SDA(SDI/MOSI) -> GPIO11
+            ADO(SDO/MISO) -> GPIO12 | NCS(CS) -> GPIO10 | INT -> GPIO14
     Barometer:  BMP280 (I2C Bus 0)
                   VCC -> 3.3V  | GND -> GND
                   SCL -> GPIO9 | SDA -> GPIO8
@@ -183,20 +182,6 @@ uint8_t flightmode_prev = 255; //Previous flight mode for transition detection (
 //========================================================================================================================//
 
 void setup() {
-  // =========================================================
-  // Hardware-specific pin init BEFORE madflight_setup()
-  // =========================================================
-
-  // MPU-9265 ADO pin (GPIO12): kéo xuống LOW để chọn I2C address 0x68
-  // ADO=LOW -> 0x68 (default), ADO=HIGH -> 0x69
-  pinMode(12, OUTPUT);
-  digitalWrite(12, LOW);
-
-  // MPU-9265 NCS pin (GPIO10): kéo lên HIGH để enable I2C mode (thay vì SPI)
-  // madflight cũng làm điều này nhưng chủ động set sớm để đảm bảo
-  pinMode(10, OUTPUT);
-  digitalWrite(10, HIGH);
-
   // =========================================================
   // Setup madflight modules, start madflight RTOS tasks
   // =========================================================

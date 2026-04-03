@@ -1,7 +1,7 @@
 .pio/build/ESP32-S3-N16R8/FrameworkArduino/esp32-hal-spi.c.o: \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-spi.c \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-spi.h \
- C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/qio_qspi/include/sdkconfig.h \
+ C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/qio_opi/include/sdkconfig.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_system/include/esp_system.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_err.h \

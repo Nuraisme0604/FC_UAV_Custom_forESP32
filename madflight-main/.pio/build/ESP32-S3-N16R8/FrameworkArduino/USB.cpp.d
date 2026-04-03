@@ -1,7 +1,7 @@
 .pio/build/ESP32-S3-N16R8/FrameworkArduino/USB.cpp.o: \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/cores/esp32/USB.cpp \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/cores/esp32/USB.h \
- C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/qio_qspi/include/sdkconfig.h \
+ C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/qio_opi/include/sdkconfig.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_event/include/esp_event.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_err.h \
  C:/Users/nhokp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/esp_common/include/esp_compiler.h \
