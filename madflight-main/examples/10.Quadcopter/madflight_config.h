@@ -33,9 +33,9 @@ led_gizmo     HIGH_IS_ON
 pin_led       2
 
 // --- I2C Bus 0 --- Barometer BMP280 ---
-// SDA=8, SCL=9 → trùng với default, không cần override
-// pin_i2c0_sda  8   ← default đã có
-// pin_i2c0_scl  9   ← default đã có
+// SDA=8, SCL=9
+pin_i2c0_sda  8
+pin_i2c0_scl  9
 
 // --- IMU: MPU-9265 (tương thích MPU-9250) chạy SPI ---
 imu_gizmo     MPU9250   // MPU-9265 tương thích hoàn toàn với driver MPU9250
@@ -47,7 +47,7 @@ pin_imu_cs    10        // SPI chip select
 // --- Barometer: BMP280 ---
 bar_gizmo     BMP280
 bar_i2c_bus   0
-bar_i2c_adr   0         // 0 = địa chỉ mặc định (0x76 khi SDO=GND)
+bar_i2c_adr   0         // 0 = auto (0x76 hoặc 0x77)
 
 // --- Magnetometer: AK8963 bên trong MPU-9250 ---
 // Được kết nối tự động qua IMU driver, không cần config thêm

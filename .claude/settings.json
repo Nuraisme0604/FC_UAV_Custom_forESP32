@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(timeout 20 pio device monitor --baud 115200)",
+      "Bash(timeout 25 pio device monitor --baud 115200 --port COM9)",
+      "Bash(pio device:*)"
+    ]
+  }
+}
